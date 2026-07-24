@@ -1,0 +1,84 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge"; 
+
+export default function PricingPage() {
+  const [plans, setPlans] = useState([]);
+
+  useEffect(() => {
+  const fetchPlans = async () => {
+    try {
+      const res = await fetch("http://localhost:3001/api/plans");
+      const data = await res.json();
+      setPlans(data.plans);
+    } catch (error) {
+      console.error("Error fetching plans:", error);
+    }
+  };
+
+  fetchPlans();
+}, []);
+
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-16 px-6">
+      <h1 className="text-4xl font-bold mb-4 text-primary">Subscription Plans</h1>
+      <p className="text-muted-foreground mb-12 text-center max-w-2xl">
+        Choose the plan that fits your needs. Upgrade, downgrade, or cancel anytime.
+      </p>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+        {plans.map(plan => (
+          <Card
+            key={plan.name}
+            className={`relative flex flex-col justify-between border rounded-lg shadow-sm transition-transform hover:scale-[1.02] ${
+              plan.isPopular ? "border-primary" : "border-border"
+            }`}
+          >
+            
+            {plan.isPopular && (
+              <Badge 
+                className="absolute top-4 right-4 bg-red-600 text-white px-3 py-1 rounded-md shadow-md"
+              >
+                Most Popular
+              </Badge>
+            )}
+
+            <CardHeader>
+              <CardTitle className="text-2xl font-semibold">{plan.name}</CardTitle>
+              <CardDescription className="mt-2 text-muted-foreground">
+                {plan.billingInterval}
+              </CardDescription>
+              <p className="text-3xl font-bold text-primary mt-4">{plan.price}</p>
+            </CardHeader>
+
+            <CardContent className="flex-1">
+              <ul className="mt-6 space-y-3 text-sm text-muted-foreground">
+                {plan.features.map((f, i) => (
+                  <li key={i} className="flex items-center gap-2">
+                    <span className="text-primary">✔</span>
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+
+            <CardFooter>
+              <Button
+                className="w-full"
+                variant="default"
+                onClick={() => {
+                  window.location.href = `http://localhost:5000/api/checkout?plan=${plan.name}`;
+                }}
+              >
+                {plan.isPopular ? "Get Started" : "Select Plan"}
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

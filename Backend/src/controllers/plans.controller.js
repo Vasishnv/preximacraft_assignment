@@ -19,7 +19,8 @@ export const getPlans=async (req,res)=>{
         name: plan.name,
         features: plan.features,
         price: `$${plan.price}/${plan.billingInterval}`,
-        billingInterval:plan.billingInterval
+        billingInterval:plan.billingInterval,
+        isPopular:plan.isPopular
             }));
         
         return res.status(201).json({plans:formattedPlans})
