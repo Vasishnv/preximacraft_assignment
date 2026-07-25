@@ -22,6 +22,32 @@ export default function PricingPage() {
   fetchPlans();
 }, []);
 
+const createOrder = async (planId) => {
+  try {
+    const res = await fetch("http://localhost:5000/api/payments/create-order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Replace with a real JWT token from your auth flow
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_JWT_TOKEN}`, 
+      },
+      body: JSON.stringify({ planId }),
+    });
+
+    if (!res.ok) {
+      throw new Error(`Server error: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    console.log("Order created:", data);
+
+    // You can redirect or handle checkout here
+    // window.location.href = data.checkoutUrl; // example if backend returns a URL
+  } catch (err) {
+    console.error("Payment error:", err);
+  }
+};
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col items-center py-16 px-6">
       <h1 className="text-4xl font-bold mb-4 text-primary">Subscription Plans</h1>
@@ -69,9 +95,8 @@ export default function PricingPage() {
               <Button
                 className="w-full"
                 variant="default"
-                onClick={() => {
-                  window.location.href = `http://localhost:5000/api/checkout?plan=${plan.name}`;
-                }}
+                onClick={() => handleSelectPlan(plan.id)}
+                
               >
                 {plan.isPopular ? "Get Started" : "Select Plan"}
               </Button>
