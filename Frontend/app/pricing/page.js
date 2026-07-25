@@ -14,6 +14,7 @@ export default function PricingPage() {
       const res = await fetch("http://localhost:3001/api/plans");
       const data = await res.json();
       setPlans(data.plans);
+      console.log(plans)
     } catch (error) {
       console.error("Error fetching plans:", error);
     }
@@ -24,12 +25,17 @@ export default function PricingPage() {
 
 const createOrder = async (planId) => {
   try {
-    const res = await fetch("http://localhost:5000/api/payments/create-order", {
+    console.log(planId)
+    const token = localStorage.getItem("token");
+    if(!token){
+        window.location.href = "/login"
+        return;
+    }
+    const res = await fetch("http://localhost:3001/api/checkout/create-order", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Replace with a real JWT token from your auth flow
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_JWT_TOKEN}`, 
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ planId }),
     });
@@ -39,10 +45,33 @@ const createOrder = async (planId) => {
     }
 
     const data = await res.json();
-    console.log("Order created:", data);
 
-    // You can redirect or handle checkout here
-    // window.location.href = data.checkoutUrl; // example if backend returns a URL
+    const options = {
+      key: data.keyId,
+      amount: data.amount,
+      currency: data.currency,
+      order_id: data.orderId,
+      name: "Your App Name",
+      handler: async (response) => {
+        const verifyRes = await fetch("http://localhost:3001/api/checkout/verify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(response),
+        });
+
+        if (verifyRes.ok) {
+          window.location.href = "/dashboard";
+        } else {
+          console.error("Verification failed");
+        }
+      },
+    };
+
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   } catch (err) {
     console.error("Payment error:", err);
   }
@@ -95,7 +124,7 @@ const createOrder = async (planId) => {
               <Button
                 className="w-full"
                 variant="default"
-                onClick={() => handleSelectPlan(plan.id)}
+                onClick={() => createOrder(plan.id)}
                 
               >
                 {plan.isPopular ? "Get Started" : "Select Plan"}

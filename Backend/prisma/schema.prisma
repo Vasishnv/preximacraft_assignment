@@ -33,6 +33,7 @@ model Plan {
   isActive        Boolean         @default(true)
   createdAt       DateTime        @default(now())
   subscriptions   Subscription[]
+  payments        Payment[]
 }
 
 enum SubscriptionStatus {
@@ -66,6 +67,8 @@ enum PaymentStatus {
 model Payment {
   id                Int           @id @default(autoincrement())
   userId            Int
+  planId            Int
+  plan              Plan          @relation(fields: [planId], references: [id])
   user              User          @relation(fields: [userId], references: [id])
   subscriptionId    Int?
   subscription      Subscription? @relation(fields: [subscriptionId], references: [id])

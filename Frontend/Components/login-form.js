@@ -38,7 +38,7 @@ export function LoginForm({ className, ...props }) {
 
     if (res.success) {
       alert("Login successful");
-      // redirect later
+      window.location.href = "/dashboard";
     } else {
       alert(res.message);
     }

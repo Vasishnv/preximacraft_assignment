@@ -4,6 +4,7 @@ export const getPlans=async (req,res)=>{
     try{
             const plans = await prisma.plan.findMany({
               select: {
+                id:true,
                 name: true,
                 price: true,
                features: true,
@@ -16,6 +17,7 @@ export const getPlans=async (req,res)=>{
         });
 
         const formattedPlans = plans.map(plan => ({
+        id:plan.id,
         name: plan.name,
         features: plan.features,
         price: `$${plan.price}/${plan.billingInterval}`,

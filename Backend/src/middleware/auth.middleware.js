@@ -12,11 +12,14 @@ export const authenticate = (req,res,next)=>{
     }
     try{
         const decoded = jwt.verify(token,process.env.JWT_SECRET);
-        req.userid = decoded.userId;
+        req.userId = decoded.userId;
         next()
     }
     catch(err){
-        return res.status(401).json({ error: 'Invalid token provided' });
+       
+            console.log("JWT verify error:", err.message);
+            return res.status(401).json({ error: 'Invalid token provided' });
+
     }
 
 
