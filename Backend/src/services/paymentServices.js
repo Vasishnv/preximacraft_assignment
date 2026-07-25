@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import { sendEmail } from "./emailService.js";
 
 export const handlePaymentSuccess = async (paymentId, razorpayPaymentId) => {
   const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
@@ -33,5 +34,21 @@ export const handlePaymentSuccess = async (paymentId, razorpayPaymentId) => {
     data: { subscriptionId: subscription.id },
   });
 
+  const invoiceNumber = `INV-${new Date().getFullYear()}-${String(paymentId).padStart(4, "0")}`;
+  await prisma.invoice.create({
+    data: {
+      userId: payment.userId,
+      paymentId: payment.id,
+      invoiceNumber,
+      amount: payment.amount,
+      status: "ISSUED",
+    },
+  });
+  const user = await prisma.user.findUnique({ where: { id: payment.userId } });
+  await sendEmail(
+    user.email,
+    "Subscription Confirmed",
+    `Your subscription is now active. Invoice: ${invoiceNumber}, Amount: ₹${payment.amount}`
+  );
   return updatedPayment;
 };
