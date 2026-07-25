@@ -1,4 +1,5 @@
 import prisma from "../lib/prisma.js";
+import { generateInvoicePDF } from "../services/pdfService.js";
 
 export const getMySubscription = async (req, res) => {
   try {
@@ -88,5 +89,31 @@ export const cancelsub = async(req,res)=>{
   } catch (err) {
     console.error(err);
     return res.status(500).json({ error: "something went wrong" });
+  }
+};
+
+
+export const downloadInvoice = async (req, res) => {
+  try {
+    const invoiceId = Number(req.params.id);
+
+    const invoice = await prisma.invoice.findUnique({
+      where: { id: invoiceId },
+      include: { payment: { include: { plan: true } } },
+    });
+
+    if (!invoice || invoice.userId !== req.userId) {
+      return res.status(404).json({ error: "Invoice not found" });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: req.userId } });
+    const pdfBuffer = await generateInvoicePDF(invoice, user, invoice.payment.plan);
+
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `attachment; filename=${invoice.invoiceNumber}.pdf`);
+    res.send(pdfBuffer);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to generate invoice PDF" });
   }
 };

@@ -1,5 +1,5 @@
 import {Router} from "express"
-import { cancelsub, changePlan, getMyInvoices, getMyPayments, getMySubscription } from "../controllers/sub.controller.js";
+import { cancelsub, changePlan, downloadInvoice, getMyInvoices, getMyPayments, getMySubscription } from "../controllers/sub.controller.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 
 
@@ -10,5 +10,6 @@ subrouter.get("/payments",authenticate,getMyPayments);
 subrouter.get("/invoices",authenticate,getMyInvoices);
 subrouter.post("/cancel",authenticate,cancelsub);
 subrouter.post("/change",authenticate,changePlan);
+subrouter.get("/invoices/:id/download", authenticate, downloadInvoice);
 
 export default subrouter;
