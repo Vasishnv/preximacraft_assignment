@@ -1,21 +1,21 @@
 generator client {
-     provider = "prisma-client-js"
-   }
+  provider = "prisma-client-js"
+}
 
-   datasource db {
-     provider = "postgresql"
-     
-   }
+datasource db {
+  provider = "postgresql"
+}
+
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  passwordHash String
-  name         String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  passwordHash  String
+  name          String
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
   subscriptions Subscription[]
-  payments Payment[]
-  invoices Invoice[]
+  payments      Payment[]
+  invoices      Invoice[]
 }
 
 enum BillingInterval {
@@ -24,15 +24,15 @@ enum BillingInterval {
 }
 
 model Plan {
-  id              Int              @id @default(autoincrement())
+  id              Int             @id @default(autoincrement())
   name            String
   price           Decimal
-  billingInterval BillingInterval  @default(MONTHLY)
+  billingInterval BillingInterval @default(MONTHLY)
   features        String[]
-  isPopular       Boolean          @default(false)
-  isActive        Boolean          @default(true)
-  createdAt       DateTime         @default(now())
-  subscriptions Subscription[]
+  isPopular       Boolean         @default(false)
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  subscriptions   Subscription[]
 }
 
 enum SubscriptionStatus {
@@ -42,18 +42,18 @@ enum SubscriptionStatus {
 }
 
 model Subscription {
-  id                Int                @id @default(autoincrement())
-  userId            Int
-  user              User               @relation(fields: [userId], references: [id])
-  planId            Int
-  plan              Plan               @relation(fields: [planId], references: [id])
-  status            SubscriptionStatus @default(ACTIVE)
-  cancelAtPeriodEnd Boolean            @default(false)
+  id                 Int                @id @default(autoincrement())
+  userId             Int
+  user               User               @relation(fields: [userId], references: [id])
+  planId             Int
+  plan               Plan               @relation(fields: [planId], references: [id])
+  status             SubscriptionStatus @default(ACTIVE)
+  cancelAtPeriodEnd  Boolean            @default(false)
   currentPeriodStart DateTime
-  currentPeriodEnd  DateTime
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  payments Payment[]
+  currentPeriodEnd   DateTime
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  payments           Payment[]
 }
 
 enum PaymentStatus {
@@ -64,18 +64,18 @@ enum PaymentStatus {
 }
 
 model Payment {
-  id                 Int           @id @default(autoincrement())
-  userId             Int
-  user               User          @relation(fields: [userId], references: [id])
-  subscriptionId     Int
-  subscription       Subscription  @relation(fields: [subscriptionId], references: [id])
-  razorpayOrderId    String        @unique
-  razorpayPaymentId  String?
-  amount             Decimal
-  status             PaymentStatus @default(CREATED)
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
-  invoice Invoice?
+  id                Int           @id @default(autoincrement())
+  userId            Int
+  user              User          @relation(fields: [userId], references: [id])
+  subscriptionId    Int?
+  subscription      Subscription? @relation(fields: [subscriptionId], references: [id])
+  razorpayOrderId   String        @unique
+  razorpayPaymentId String?
+  amount            Decimal
+  status            PaymentStatus @default(CREATED)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  invoice           Invoice?
 }
 
 enum InvoiceStatus {
@@ -97,10 +97,10 @@ model Invoice {
 }
 
 model WebhookEvent {
-  id              Int      @id @default(autoincrement())
-  eventId         String   @unique
-  eventType       String
-  payload         Json
-  processed       Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  eventId   String   @unique
+  eventType String
+  payload   Json
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
