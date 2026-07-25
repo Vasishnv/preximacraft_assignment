@@ -2,6 +2,9 @@
 
 A full-stack subscription billing platform built with Next.js, Express, PostgreSQL (Prisma ORM), and Razorpay (test mode) — built as a take-home assignment for Prexima.
 
+## Demo vedio link
+https://www.dropbox.com/scl/fi/3ym6xwhgb45i3kl5x87xn/schema.prisma-Interview-Prexima-Visual-Studio-Code-2026-07-25-15-49-26.mp4?rlkey=urq7dmpfnifjldva1zfq2irbn&st=wjq1j1te&dl=0
+
 ## Tech Stack
 
 - **Frontend:** Next.js, React, Tailwind CSS, shadcn/ui
